@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "HostSciter.h"
 
-
+// hi
 HostSciter::HostSciter()
 {
 }
@@ -43,4 +43,3 @@ void HostSciter::LoadPage(wchar_t* path)
 	bool load = load_file(url.c_str());
 	_ASSERT(load);
 }
-
