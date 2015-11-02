@@ -17,17 +17,10 @@ public:
 private:
 	void LoadPage(wchar_t* path);
 
-	json::value Host_HelloWorld()
-	{
-		return json::value(L"Hello World! (from native side)");
-	}
-
 	BEGIN_FUNCTION_MAP
 		// Put here your handlers for function calls from script
 
 		// Note: if you don't wan't to use this macro heavy way, I recommend you to declare 'virtual bool on_script_call(...)' yourself
 		// Note: if you use FUNCTION_2 for example, your function handler NEEDS to have two json::value parameters
-
-		FUNCTION_0("Host_HelloWorld", Host_HelloWorld);
 	END_FUNCTION_MAP
 };
