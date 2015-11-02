@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "HostSciter.h"
 
-// hi
+
 HostSciter::HostSciter()
 {
 }
