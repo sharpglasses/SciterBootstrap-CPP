@@ -8,14 +8,11 @@ Release/
 *.o
 *.obj
 *.suo
-*.sdf
-*.aps
 .vs
-
-#C++ projects
 ipch/
-.sdf
-.aps
+*.sdf
+*.opensdf
+*.aps
 
 
 #DUB things

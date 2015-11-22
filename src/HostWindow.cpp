@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "HostWindow.h"
 
-
 LRESULT SC_CALLBACK ProcessWindowMessage(HWINDOW hwnd, UINT msg, WPARAM wParam, LPARAM lParam, LPVOID pParam, BOOL* pHandled)
 {
 	return 0;
