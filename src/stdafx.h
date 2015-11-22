@@ -19,7 +19,11 @@
 
 
 // TODO: reference additional headers your program requires here
-#pragma comment(lib, "vendor/sciter-sdk-3/lib/sciter32.lib")
+#ifdef _M_X64
+	#pragma comment(lib, "vendor/sciter-sdk-3/lib/sciter64.lib")
+#else
+	#pragma comment(lib, "vendor/sciter-sdk-3/lib/sciter32.lib")
+#endif
 #define STATIC_LIB
 #include "sciter-x.h"
 

@@ -15,6 +15,11 @@ public:
 	HINSTANCE get_resource_instance() { _ASSERT(false); return 0; }
 
 private:
+	// Things to do here:
+	// -override on_load_data() to customize or track resource loading
+	// -override on_posted_notification() to handle notifications generated with SciterPostCallback()
+
+private:
 	void LoadPage(wchar_t* path);
 
 	BEGIN_FUNCTION_MAP
