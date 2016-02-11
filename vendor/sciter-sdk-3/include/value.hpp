@@ -43,6 +43,8 @@
     // ascii or utf8 string
     typedef std::basic_string<char>  astring;
 
+    typedef std::runtime_error script_error;
+
     // value by key bidirectional proxy/accessor 
     class value_key_a;
     // value by index bidirectional proxy/accessor 
@@ -241,9 +243,9 @@
       {
         if( how == CVT_SIMPLE && is_string() )
           return aux::make_string(get_chars()); // do not need to allocate
-        value t = *this;
-        ValueToString(&t,how);
-        return aux::make_string(t.get_chars());
+        value tv = *this;
+        ValueToString(&tv,how);
+        return aux::make_string(tv.get_chars());
       }
 
       void clear()
