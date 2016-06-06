@@ -376,7 +376,7 @@ namespace tiscript
 
     int   length() const { return argc; }
     value get(int pn) const { return ni()->get_arg_n(vm,pn); }
-    value operator[](int n) const { return get(n); }
+    value operator[](int i) const { return get(i); }
 
     args& operator >> (bool& v)   { if( opt && (n >= argc) ) return *this;  if(!ni()->get_bool_value(get(n),&v)) throw error(n,"boolean"); n++;  return *this; }
     args& operator >> (int& v)    { if( opt && (n >= argc) ) return *this;  if(!ni()->get_int_value(get(n),&v)) throw error(n,"integer"); n++; return *this; }
@@ -430,8 +430,8 @@ namespace tiscript
 
   struct method_def: public tiscript_method_def
   {
-    method_def() { dispatch = 0; name = 0; handler = 0; tag = 0; }
-    method_def(const char *n, method_impl* h) { dispatch = 0, name = n; handler = h; tag = 0; }
+    method_def() { dispatch = 0; name = 0; handler = 0; tag = 0; payload = 0;}
+    method_def(const char *n, method_impl* h) { dispatch = 0, name = n; handler = h; tag = 0; payload = 0;}
   };
   struct prop_def: public tiscript_prop_def
   {
@@ -493,14 +493,14 @@ namespace tiscript
     return (rv2); }
 
 #define TISCRIPT_RETURN_3(c,rv1,rv2,rv3) \
-  { tiscript::ni()->set_nth_retval(vm,2,(rv1)); \
-    tiscript::ni()->set_nth_retval(vm,1,(rv2)); \
+  { tiscript::ni()->set_nth_retval(vm,1,(rv2)); \
+    tiscript::ni()->set_nth_retval(vm,2,(rv1)); \
     return (rv3); }
 
 #define TISCRIPT_RETURN_4(c,rv1,rv2,rv3,rv4) \
-  { tiscript::ni()->set_nth_retval(vm,3,(rv1)); \
+  { tiscript::ni()->set_nth_retval(vm,1,(rv3)); \
     tiscript::ni()->set_nth_retval(vm,2,(rv2)); \
-    tiscript::ni()->set_nth_retval(vm,1,(rv3)); \
+    tiscript::ni()->set_nth_retval(vm,3,(rv1)); \
     return (rv4); }
 
 #endif

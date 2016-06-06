@@ -1,14 +1,15 @@
 /*
- * Terra Informatica Sciter Engine
- * http://terrainformatica.com/sciter
- *
- * Behaviors support (a.k.a windowless controls)
- *
+ * The Sciter Engine of Terra Informatica Software, Inc.
+ * http://sciter.com
+ * 
  * The code and information provided "as-is" without
  * warranty of any kind, either expressed or implied.
- *
- *
- * (C) 2003-2015, Andrew Fedoniouk (andrew@terrainformatica.com)
+ * 
+ * (C) 2003-2015, Terra Informatica Software, Inc.
+ */
+
+/*
+ * Behaviors support (a.k.a windowless controls)
  */
 
 #ifndef __sciter_x_behavior_h__
@@ -21,6 +22,7 @@
 #include "sciter-x-types.h"
 #include "sciter-x-dom.h"
 #include "sciter-x-value.h"
+#include "sciter-x-graphics.h"
 
 #pragma pack(push,8)
 
@@ -35,7 +37,7 @@
       HANDLE_SCROLL = 0x0008,         /** scroll events */
       HANDLE_TIMER = 0x0010,          /** timer event */
       HANDLE_SIZE = 0x0020,           /** size changed event */
-      //HANDLE_DRAW = 0x0040,           /** drawing request (event) */
+      HANDLE_DRAW = 0x0040,           /** drawing request (event) */
       HANDLE_DATA_ARRIVED = 0x080,    /** requested data () has been delivered */
       HANDLE_BEHAVIOR_EVENT        = 0x0100, /** logical, synthetic events:
                                                  BUTTON_CLICK, HYPERLINK_CLICK, etc.,
@@ -53,7 +55,7 @@
   };
 
 /**Element callback function for all types of events. Similar to WndProc
- * \param tag \b LPVOID, tag assigned by HTMLayoutAttachElementProc function (like GWL_USERDATA)
+ * \param tag \b LPVOID, tag assigned by SciterAttachEventHandler function (like GWL_USERDATA)
  * \param he \b HELEMENT, this element handle (like HWINDOW)
  * \param evtg \b UINT, group identifier of the event, value is one of EVENT_GROUPS
  * \param prms \b LPVOID, pointer to group specific parameters structure.
@@ -286,7 +288,7 @@ typedef BOOL SC_CALLBACK SciterBehaviorFactory( LPCSTR, HELEMENT, LPElementEvent
   struct DRAW_PARAMS
   {
       UINT             cmd;       // DRAW_EVENTS
-      SCITER_GRAPHICS* gfx;       // hdc to paint on
+      HGFX             gfx;       // hdc to paint on
       RECT             area;      // element area, to get invalid area to paint use GetClipBox,
       UINT             reserved;  // for DRAW_BACKGROUND/DRAW_FOREGROUND - it is a border box
                                   // for DRAW_CONTENT - it is a content box
@@ -358,7 +360,7 @@ typedef BOOL SC_CALLBACK SciterBehaviorFactory( LPCSTR, HELEMENT, LPElementEvent
                                      // used for example by accesskeys behaviors to send activation request, e.g. tab on behavior:tabs.
 
       //DO_SWITCH_TAB = ACTIVATE_CHILD,// command to switch tab programmatically, handled by behavior:tabs
-      //                               // use it as HTMLayoutPostEvent(tabsElementOrItsChild, DO_SWITCH_TAB, tabElementToShow, 0);
+      //                               // use it as SciterPostEvent(tabsElementOrItsChild, DO_SWITCH_TAB, tabElementToShow, 0);
 
       INIT_DATA_VIEW,                // request to virtual grid to initialize its view
       
@@ -413,10 +415,10 @@ typedef BOOL SC_CALLBACK SciterBehaviorFactory( LPCSTR, HELEMENT, LPElementEvent
       FIRST_APPLICATION_EVENT_CODE = 0x100
       // all custom event codes shall be greater
       // than this number. All codes below this will be used
-      // solely by application - HTMLayout will not intrepret it
+      // solely by application - Sciter will not intrepret it
       // and will do just dispatching.
       // To send event notifications with  these codes use
-      // HTMLayoutSend/PostEvent API.
+      // SciterSend/PostEvent API.
 
   };
 
@@ -450,13 +452,13 @@ typedef BOOL SC_CALLBACK SciterBehaviorFactory( LPCSTR, HELEMENT, LPElementEvent
 
   typedef struct TIMER_PARAMS
   {
-      UINT_PTR timerId;    // timerId that was used to create timer by using HTMLayoutSetTimerEx
+      UINT_PTR timerId;    // timerId that was used to create timer by using SciterSetTimer
   } TIMER_PARAMS;
 
 
 
   // identifiers of methods currently supported by intrinsic behaviors,
-  // see function HTMLayoutCallMethod
+  // see function SciterCallBehaviorMethod
 
   enum BEHAVIOR_METHOD_IDENTIFIERS
   {
@@ -532,10 +534,10 @@ typedef BOOL SC_CALLBACK SciterBehaviorFactory( LPCSTR, HELEMENT, LPElementEvent
 
   typedef struct DATA_ARRIVED_PARAMS
   {
-      HELEMENT  initiator;    // element intiator of HTMLayoutRequestElementData request,
+      HELEMENT  initiator;    // element intiator of SciterRequestElementData request,
       LPCBYTE   data;         // data buffer
       UINT      dataSize;     // size of data
-      UINT      dataType;     // data type passed "as is" from HTMLayoutRequestElementData
+      UINT      dataType;     // data type passed "as is" from SciterRequestElementData
       UINT      status;       // status = 0 (dataSize == 0) - unknown error. 
                               // status = 100..505 - http response status, Note: 200 - OK! 
                               // status > 12000 - wininet error code, see ERROR_INTERNET_*** in wininet.h
@@ -642,7 +644,7 @@ typedef BOOL SC_CALLBACK SciterBehaviorFactory( LPCSTR, HELEMENT, LPElementEvent
           return on_event(he, params.heTarget, (BEHAVIOR_EVENTS)params.cmd, params.reason );
         }
 
-      // notification event: data requested by HTMLayoutRequestData just delivered
+      // notification event: data requested by SciterRequestElementData just delivered
       virtual bool handle_data_arrived (HELEMENT he, DATA_ARRIVED_PARAMS& params )
         {
           return on_data_arrived(he, params.initiator, params.data, params.dataSize, params.dataType );
@@ -667,7 +669,7 @@ typedef BOOL SC_CALLBACK SciterBehaviorFactory( LPCSTR, HELEMENT, LPElementEvent
       virtual bool on_focus  (HELEMENT he, HELEMENT target, UINT event_type ) { return false; }
       virtual bool on_timer  (HELEMENT he ) { return false; /*stop this timer*/ }
       virtual bool on_timer  (HELEMENT he, UINT_PTR extTimerId ) { return false; /*stop this timer*/ }
-      virtual bool on_draw   (HELEMENT he, UINT draw_type, SCITER_GRAPHICS* hdc, const RECT& rc ) { return false; /*do default draw*/ }
+      virtual bool on_draw   (HELEMENT he, UINT draw_type, HGFX hgfx, const RECT& rc ) { return false; /*do default draw*/ }
       virtual void on_size   (HELEMENT he ) { }
 
       virtual bool on_method_call (HELEMENT he, UINT methodID, METHOD_PARAMS* params ) { return false; /*not handled*/ }
@@ -689,7 +691,7 @@ typedef BOOL SC_CALLBACK SciterBehaviorFactory( LPCSTR, HELEMENT, LPElementEvent
       // see enum BEHAVIOR_EVENTS
       virtual bool on_event (HELEMENT he, HELEMENT target, BEHAVIOR_EVENTS type, UINT_PTR reason ) { return false; }
 
-      // notification event: data requested by HTMLayoutRequestData just delivered
+      // notification event: data requested by SciterRequestElementData just delivered
       virtual bool on_data_arrived (HELEMENT he, HELEMENT initiator, LPCBYTE data, UINT dataSize, UINT dataType ) { return false; }
 
       virtual bool on_scroll( HELEMENT he, HELEMENT target, SCROLL_EVENTS cmd, INT pos, BOOL isVertical ) { return false; }
@@ -717,14 +719,14 @@ typedef BOOL SC_CALLBACK SciterBehaviorFactory( LPCSTR, HELEMENT, LPElementEvent
             case HANDLE_MOUSE: {  MOUSE_PARAMS *p = (MOUSE_PARAMS *)prms; return pThis->handle_mouse( he, *p );  }
             case HANDLE_KEY:   {  KEY_PARAMS *p = (KEY_PARAMS *)prms; return pThis->handle_key( he, *p ); }
             case HANDLE_FOCUS: {  FOCUS_PARAMS *p = (FOCUS_PARAMS *)prms; return pThis->handle_focus( he, *p ); }
-            //case HANDLE_DRAW:  {  DRAW_PARAMS *p = (DRAW_PARAMS *)prms; return pThis->handle_draw(he, *p ); }
+            case HANDLE_DRAW:  {  DRAW_PARAMS *p = (DRAW_PARAMS *)prms; return pThis->handle_draw(he, *p ); }
             case HANDLE_TIMER: {  TIMER_PARAMS *p = (TIMER_PARAMS *)prms; return pThis->handle_timer(he, *p); }
             case HANDLE_BEHAVIOR_EVENT:   { BEHAVIOR_EVENT_PARAMS *p = (BEHAVIOR_EVENT_PARAMS *)prms; return pThis->handle_event(he, *p ); }
             case HANDLE_METHOD_CALL:      { METHOD_PARAMS *p = (METHOD_PARAMS *)prms; return pThis->handle_method_call(he, *p ); }
             case HANDLE_DATA_ARRIVED:     { DATA_ARRIVED_PARAMS *p = (DATA_ARRIVED_PARAMS *)prms; return pThis->handle_data_arrived(he, *p ); }
             case HANDLE_SCROLL:     { SCROLL_PARAMS *p = (SCROLL_PARAMS *)prms; return pThis->handle_scroll(he, *p ); }
             case HANDLE_SIZE:  {  pThis->handle_size(he); return false; }
-            // call using json::value's (from CSSS!)
+            // call using sciter::value's (from CSSS!)
             case HANDLE_SCRIPTING_METHOD_CALL: { SCRIPTING_METHOD_PARAMS* p = (SCRIPTING_METHOD_PARAMS *)prms; return pThis->handle_scripting_call(he, *p ); }
             // call using tiscript::value's (from the script)
             case HANDLE_TISCRIPT_METHOD_CALL: { TISCRIPT_METHOD_PARAMS* p = (TISCRIPT_METHOD_PARAMS *)prms; return pThis->handle_scripting_call(he, *p ); }
@@ -792,7 +794,7 @@ typedef BOOL SC_CALLBACK SciterBehaviorFactory( LPCSTR, HELEMENT, LPElementEvent
     }
 
 #define BEGIN_FUNCTION_MAP \
-    virtual bool on_script_call(HELEMENT he, LPCSTR name, UINT argc, json::value* argv, json::value& retval) \
+    virtual bool on_script_call(HELEMENT he, LPCSTR name, UINT argc, sciter::value* argv, sciter::value& retval) \
     { \
       aux::chars _name = aux::chars_of(name);
 

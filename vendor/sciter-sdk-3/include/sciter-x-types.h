@@ -1,10 +1,17 @@
-//
-//  sciter-x-types.h
-//  sciter
-//
-//  Created by andrew on 2014-03-29.
-//  Copyright (c) 2014 andrew fedoniouk. All rights reserved.
-//
+/*
+ * The Sciter Engine of Terra Informatica Software, Inc.
+ * http://sciter.com
+ *
+ * The code and information provided "as-is" without
+ * warranty of any kind, either expressed or implied.
+ *
+ * (C) 2003-2015, Terra Informatica Software, Inc.
+ */
+
+/*
+ * Sciter basic types, platform isolation declarations
+ */
+
 
 #ifndef sciter_sciter_x_types_h
 #define sciter_sciter_x_types_h
@@ -216,10 +223,10 @@
 
   #ifdef __x86_64
     #define TARGET_64
-    #define SCITER_DLL_NAME "sciter-gtk-64.so"
+    #define SCITER_DLL_NAME "libsciter-gtk-64.so"
   #else
     #define TARGET_32
-    #define SCITER_DLL_NAME "sciter-gtk-32.so"
+    #define SCITER_DLL_NAME "libsciter-gtk-32.so"
   #endif
 
 
@@ -245,6 +252,11 @@
   typedef const BYTE* LPCBYTE;
 #endif
 
+/**callback function used with various get*** functions */
+typedef VOID SC_CALLBACK LPCWSTR_RECEIVER( LPCWSTR str, UINT str_length, LPVOID param );
+typedef VOID SC_CALLBACK LPCSTR_RECEIVER( LPCSTR str, UINT str_length, LPVOID param );
+typedef VOID SC_CALLBACK LPCBYTE_RECEIVER( LPCBYTE str, UINT num_bytes, LPVOID param );
+
 #define STDCALL __stdcall
 
 #ifdef __cplusplus
@@ -254,6 +266,7 @@
   namespace std {
     typedef basic_string<WCHAR> ustring;
   }
+
 
   // Note: quote here is a string literal!
   #ifdef WINDOWS
@@ -267,6 +280,7 @@
 #else
   #define EXTERN_C extern
 #endif /* __cplusplus **/
+
 
 
 #endif

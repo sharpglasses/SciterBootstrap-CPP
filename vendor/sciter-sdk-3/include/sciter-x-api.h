@@ -1,12 +1,21 @@
+/*
+ * The Sciter Engine of Terra Informatica Software, Inc.
+ * http://sciter.com
+ *
+ * The code and information provided "as-is" without
+ * warranty of any kind, either expressed or implied.
+ *
+ * (C) 2003-2015, Terra Informatica Software, Inc.
+ */
+
+
 #ifndef __SCITER_API_X__
 #define __SCITER_API_X__
 
-//|
-//| Redirection of
-//|
-
 #include "sciter-x-types.h"
+#include "sciter-x-def.h"
 #include "sciter-x-dom.h"
+#include "sciter-x-request.h"
 #include "value.h"
 #include "tiscript.hpp"
 
@@ -21,6 +30,8 @@
 #if defined(OSX)
   #include <dlfcn.h>
 #endif
+
+struct SciterGraphicsAPI;
 
 typedef struct _ISciterAPI {
 
@@ -205,12 +216,12 @@ typedef struct _ISciterAPI {
   UINT SCFN( ValueNthElementValue )( const VALUE* pval, INT n, VALUE* pretval);
   UINT SCFN( ValueNthElementValueSet )( VALUE* pval, INT n, const VALUE* pval_to_set);
   UINT SCFN( ValueNthElementKey )( const VALUE* pval, INT n, VALUE* pretval);
-  UINT SCFN( ValueEnumElements )( VALUE* pval, KeyValueCallback* penum, LPVOID param);
+  UINT SCFN( ValueEnumElements )( const VALUE* pval, KeyValueCallback* penum, LPVOID param);
   UINT SCFN( ValueSetValueToKey )( VALUE* pval, const VALUE* pkey, const VALUE* pval_to_set);
   UINT SCFN( ValueGetValueOfKey )( const VALUE* pval, const VALUE* pkey, VALUE* pretval);
   UINT SCFN( ValueToString )( VALUE* pval, /*VALUE_STRING_CVT_TYPE*/ UINT how );
   UINT SCFN( ValueFromString )( VALUE* pval, LPCWSTR str, UINT strLength, /*VALUE_STRING_CVT_TYPE*/ UINT how );
-  UINT SCFN( ValueInvoke )( VALUE* pval, VALUE* pthis, UINT argc, const VALUE* argv, VALUE* pretval, LPCWSTR url);
+  UINT SCFN( ValueInvoke )( const VALUE* pval, VALUE* pthis, UINT argc, const VALUE* argv, VALUE* pretval, LPCWSTR url);
   UINT SCFN( ValueNativeFunctorSet )( VALUE* pval, NATIVE_FUNCTOR_INVOKE*  pinvoke, NATIVE_FUNCTOR_RELEASE* prelease, VOID* tag );
   BOOL SCFN( ValueIsNativeFunctor )( const VALUE* pval);
 
@@ -230,6 +241,16 @@ typedef struct _ISciterAPI {
 
   LPVOID SCFN( SciterGetCallbackParam )(HWINDOW hwnd);
   UINT_PTR SCFN( SciterPostCallback )(HWINDOW hwnd, UINT_PTR wparam, UINT_PTR lparam, UINT timeoutms);
+
+  LPSciterGraphicsAPI SCFN( GetSciterGraphicsAPI )();
+  LPSciterRequestAPI SCFN( GetSciterRequestAPI )();
+
+#ifdef WINDOWS
+  BOOL SCFN( SciterCreateOnDirectXWindow ) (HWINDOW hwnd, IDXGISwapChain* pSwapChain);
+  BOOL SCFN( SciterRenderOnDirectXWindow ) (HWINDOW hwnd, HELEMENT elementToRenderOrNull, BOOL frontLayer);
+  BOOL SCFN( SciterRenderOnDirectXTexture ) (HWINDOW hwnd, HELEMENT elementToRenderOrNull, IDXGISurface* surface);
+#endif
+
 
 } ISciterAPI;
 
@@ -395,6 +416,19 @@ typedef ISciterAPI* (SCAPI *SciterAPI_ptr)();
 
 #endif
 
+  inline LPSciterGraphicsAPI gapi()
+  {
+    static LPSciterGraphicsAPI _gapi = SAPI()->GetSciterGraphicsAPI();
+    return _gapi;
+  }
+
+  inline LPSciterRequestAPI rapi()
+  {
+    static LPSciterRequestAPI _rapi = SAPI()->GetSciterRequestAPI();
+    return _rapi;
+  }
+
+
   // defining "official" API functions:
 
   inline   LPCWSTR SCAPI SciterClassName () { return SAPI()->SciterClassName(); }
@@ -556,17 +590,24 @@ typedef ISciterAPI* (SCAPI *SciterAPI_ptr)();
   inline UINT SCAPI ValueNthElementValue ( const VALUE* pval, INT n, VALUE* pretval) { return SAPI()->ValueNthElementValue ( pval, n, pretval); }
   inline UINT SCAPI ValueNthElementValueSet ( VALUE* pval, INT n, const VALUE* pval_to_set) { return SAPI()->ValueNthElementValueSet ( pval,n,pval_to_set); }
   inline UINT SCAPI ValueNthElementKey ( const VALUE* pval, INT n, VALUE* pretval) { return SAPI()->ValueNthElementKey ( pval,n,pretval); }
-  inline UINT SCAPI ValueEnumElements ( VALUE* pval, KeyValueCallback* penum, LPVOID param) { return SAPI()->ValueEnumElements (pval,penum,param); }
+  inline UINT SCAPI ValueEnumElements ( const VALUE* pval, KeyValueCallback* penum, LPVOID param) { return SAPI()->ValueEnumElements (pval,penum,param); }
   inline UINT SCAPI ValueSetValueToKey ( VALUE* pval, const VALUE* pkey, const VALUE* pval_to_set) { return SAPI()->ValueSetValueToKey ( pval, pkey, pval_to_set); }
   inline UINT SCAPI ValueGetValueOfKey ( const VALUE* pval, const VALUE* pkey, VALUE* pretval) { return SAPI()->ValueGetValueOfKey ( pval, pkey,pretval); }
   inline UINT SCAPI ValueToString ( VALUE* pval, UINT how ) { return SAPI()->ValueToString ( pval,how ); }
   inline UINT SCAPI ValueFromString ( VALUE* pval, LPCWSTR str, UINT strLength, UINT how ) { return SAPI()->ValueFromString ( pval, str,strLength,how ); }
-  inline UINT SCAPI ValueInvoke ( VALUE* pval, VALUE* pthis, UINT argc, const VALUE* argv, VALUE* pretval, LPCWSTR url) { return SAPI()->ValueInvoke ( pval, pthis, argc, argv, pretval, url); }
+  inline UINT SCAPI ValueInvoke ( const VALUE* pval, VALUE* pthis, UINT argc, const VALUE* argv, VALUE* pretval, LPCWSTR url) { return SAPI()->ValueInvoke ( pval, pthis, argc, argv, pretval, url); }
   inline UINT SCAPI ValueNativeFunctorSet (VALUE* pval, NATIVE_FUNCTOR_INVOKE*  pinvoke, NATIVE_FUNCTOR_RELEASE* prelease, VOID* tag ) { return SAPI()->ValueNativeFunctorSet ( pval, pinvoke,prelease,tag); }
   inline BOOL SCAPI ValueIsNativeFunctor ( const VALUE* pval) { return SAPI()->ValueIsNativeFunctor (pval); }
 
   // conversion between script (managed) value and the VALUE ( com::variant alike thing )
   inline BOOL SCAPI Sciter_v2V(HVM vm, const tiscript_value script_value, VALUE* out_value, BOOL isolate) { return SAPI()->Sciter_v2V(vm,script_value,out_value, isolate); }
   inline BOOL SCAPI Sciter_V2v(HVM vm, const VALUE* value, tiscript_value* out_script_value) { return SAPI()->Sciter_V2v(vm,value,out_script_value); }
+    
+#ifdef WINDOWS
+  inline BOOL SCAPI SciterCreateOnDirectXWindow(HWINDOW hwnd, IDXGISwapChain* pSwapChain) { return SAPI()->SciterCreateOnDirectXWindow(hwnd,pSwapChain); }
+  inline BOOL SCAPI SciterRenderOnDirectXWindow(HWINDOW hwnd, HELEMENT elementToRenderOrNull, BOOL frontLayer) { return SAPI()->SciterRenderOnDirectXWindow(hwnd,elementToRenderOrNull,frontLayer); }
+  inline BOOL SCAPI SciterRenderOnDirectXTexture(HWINDOW hwnd, HELEMENT elementToRenderOrNull, IDXGISurface* surface) { return SAPI()->SciterRenderOnDirectXTexture(hwnd,elementToRenderOrNull,surface); }
+#endif
+
 
 #endif

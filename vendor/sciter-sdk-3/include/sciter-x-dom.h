@@ -1,22 +1,17 @@
-/** \mainpage Terra Informatica Sciter engine.
- *
- * \section legal_sec In legalese
- *
+/*
+ * The Sciter Engine of Terra Informatica Software, Inc.
+ * http://sciter.com
+ * 
  * The code and information provided "as-is" without
  * warranty of any kind, either expressed or implied.
- *
- * <a href="http://terrainformatica.com/sciter">Sciter Home</a>
- *
- * (C) 2003-2015, Terra Informatica Software, Inc. and Andrew Fedoniouk
- *
- * \section structure_sec Structure of the documentation
- *
- * See <a href="files.html">Files</a> section.
- **/
+ * 
+ * (C) 2003-2015, Terra Informatica Software, Inc.
+ */
 
-/**\file
- * \brief \link sciter_dom.h DOM \endlink C++ wrapper
- **/
+/*
+ * DOM access methods, plain C interface
+ */
+
 
 #ifndef __sciter_dom_h__
 #define __sciter_dom_h__
@@ -176,18 +171,6 @@ SCDOM_RESULT SCAPI SciterGetParentElement(HELEMENT he, HELEMENT* p_parent_he);
 
 /** Get html representation of the element.
  * \param[in] he \b #HELEMENT
- * \param[out] utf8bytes \b pointer to byte address receiving UTF8 encoded HTML
- * \param[in] outer \b BOOL, if TRUE will retunr outer HTML otherwise inner.
- * \return \b #SCDOM_RESULT SCAPI
- * OBSOLETE: use SciterGetElementHtmlCB instead
- */
-//OBSOLETE SCDOM_RESULT SCAPI SciterGetElementHtml(HELEMENT he, LPCBYTE* utf8bytes, BOOL outer);
-
-/**Callback function used with #SciterGetElementHtmlCB().*/
-typedef VOID SC_CALLBACK LPCBYTE_RECEIVER( LPCBYTE bytes, UINT num_bytes, LPVOID param );
-
-/** Get html representation of the element.
- * \param[in] he \b #HELEMENT
  * \param[in] outer \b BOOL, if TRUE will retunr outer HTML otherwise inner.
  * \param[in] rcv \b pointer to function receiving UTF8 encoded HTML.
  * \param[in] rcv_param \b parameter that passed to rcv as it is.
@@ -203,10 +186,6 @@ SCDOM_RESULT SCAPI SciterGetElementHtmlCB(HELEMENT he, BOOL outer, LPCBYTE_RECEI
  */
  //OBSOLETE SCDOM_RESULT SCAPI SciterGetElementText(HELEMENT he, LPWSTR* utf16);
 
-
- /**Callback function used with #SciterGetElementTextCB().*/
- typedef VOID SC_CALLBACK LPCWSTR_RECEIVER( LPCWSTR str, UINT str_length, LPVOID param );
- typedef VOID SC_CALLBACK LPCSTR_RECEIVER( LPCSTR str, UINT str_length, LPVOID param );
 
  /**Get inner text of the element as LPCWSTR (utf16 words).
  * \param[in] he \b #HELEMENT
@@ -334,12 +313,12 @@ SCDOM_RESULT SCAPI SciterSetStyleAttribute(HELEMENT he, LPCSTR name, LPCWSTR val
 
 enum ELEMENT_AREAS
 {
-  ROOT_RELATIVE = 0x01,       // - or this flag if you want to get HTMLayout window relative coordinates,
+  ROOT_RELATIVE = 0x01,       // - or this flag if you want to get Sciter window relative coordinates,
                               //   otherwise it will use nearest windowed container e.g. popup window.
   SELF_RELATIVE = 0x02,       // - "or" this flag if you want to get coordinates relative to the origin
                               //   of element iself.
   CONTAINER_RELATIVE = 0x03,  // - position inside immediate container.
-  VIEW_RELATIVE = 0x04,       // - position relative to view - HTMLayout window
+  VIEW_RELATIVE = 0x04,       // - position relative to view - Sciter window
 
   CONTENT_BOX = 0x00,   // content (inner)  box
   PADDING_BOX = 0x10,   // content + paddings
@@ -669,7 +648,7 @@ SCDOM_RESULT SCAPI SciterDeleteElement(HELEMENT he);
 SCDOM_RESULT SCAPI SciterSetTimer( HELEMENT he, UINT milliseconds, UINT_PTR timer_id );
 
 /** Attach/Detach ElementEventProc to the element
-    See htmlayout::event_handler.
+    See sciter::event_handler.
  **/
 SCDOM_RESULT SCAPI SciterDetachEventHandler( HELEMENT he, LPELEMENT_EVENT_PROC pep, LPVOID tag );
 /** Attach ElementEventProc to the element and subscribe it to events providede by subscription parameter

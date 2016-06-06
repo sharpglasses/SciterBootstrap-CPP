@@ -43,6 +43,8 @@
     // ascii or utf8 string
     typedef std::basic_string<char>  astring;
 
+    typedef std::runtime_error script_error;
+
     // value by key bidirectional proxy/accessor 
     class value_key_a;
     // value by index bidirectional proxy/accessor 
@@ -87,9 +89,9 @@
 #endif
           
       static value currency( INT64 v )  { value t; ValueInt64DataSet(&t, v, T_CURRENCY, 0); return t;}
-      static value date( INT64 v )      { value t; ValueInt64DataSet(&t, v, T_DATE, 0);  return t;}
+      static value date( INT64 v, bool is_utc = true /* true if ft is UTC*/ )      { value t; ValueInt64DataSet(&t, v, T_DATE, is_utc);  return t;}
 #ifdef WIN32
-      static value date( FILETIME ft )  { value t; ValueInt64DataSet(&t, *((INT64*)&ft), T_DATE, 0); return t;} 
+      static value date( FILETIME ft, bool is_utc = true /* true if ft is UTC*/ )  { value t; ValueInt64DataSet(&t, *((INT64*)&ft), T_DATE, is_utc); return t;} 
 #endif
       static value symbol( aux::wchars wc ) { value t; ValueInit(&t); ValueStringDataSet(&t, LPCWSTR(wc.start), wc.length , 0xFFFF); return t; }
 
@@ -241,9 +243,9 @@
       {
         if( how == CVT_SIMPLE && is_string() )
           return aux::make_string(get_chars()); // do not need to allocate
-        value t = *this;
-        ValueToString(&t,how);
-        return aux::make_string(t.get_chars());
+        value tv = *this;
+        ValueToString(&tv,how);
+        return aux::make_string(tv.get_chars());
       }
 
       void clear()
