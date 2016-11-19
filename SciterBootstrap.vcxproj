@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\HostSciter.cpp" />
     <ClCompile Include="src\HostWindow.cpp" />
+    <ClCompile Include="src\SampleBehavior.cpp" />
     <ClCompile Include="src\SciterBootstrap.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -2,6 +2,7 @@
 <head>
 	<style>
 		h1 { color: blue; font-size: 30px; }
+		div { size: 200px; behavior: SampleBehavior; }
 	</style>
 
 	<script type="text/tiscript">
@@ -11,12 +12,16 @@
 		var version_minor = Sciter.VERSION & 0xFFFF;
 		var revision_major = Sciter.REVISION >> 16;
 		var revision_minor = Sciter.REVISION & 0xFFFF;
-		$(h2).text = "Sciter version: " + String.printf("%x.%x.%x.%x", version_major, version_minor, revision_major, revision_minor);
+		$(h2).text = "Sciter version: " + String.printf("%d.%d.%d.%d", version_major, version_minor, revision_major, revision_minor);
 	</script>
 </head>
 
 <body>
 	<h1 />
 	<h2 />
+
+	<p>A triangle drawn with a native behavior:</p>
+	<div></div>
+	<p>See file <b>SampleBehavior.cpp</b> for defining a native behavior. Behaviors can do many things, not just drawing.</p>
 </body>
 </html>
