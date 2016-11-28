@@ -303,24 +303,27 @@
       const value operator[](const value& key) const { return get_item(key); }
       value_key_a operator[](const value& key);
 
+#ifdef CPP11
       typedef std::function<bool(const value& key, const value& val)> key_value_cb;
+#endif
 
       struct enum_cb
       {
         // return true to continue enumeration
         virtual bool on(const value& key, const value& val) = 0;
+
         static BOOL SC_CALLBACK _callback( LPVOID param, const VALUE* pkey, const VALUE* pval )
         {
           enum_cb* cb = (enum_cb*)param;
           return cb->on( *(value*)pkey, *(value*)pval );
         }
-
+#ifdef CPP11
         static BOOL SC_CALLBACK lambda_callback( LPVOID param, const VALUE* pkey, const VALUE* pval )
         {
           key_value_cb* cb = (key_value_cb*)param;
           return (*cb)(*(value*)pkey, *(value*)pval );
         }
-
+#endif
       };
 
       // enum
@@ -329,11 +332,13 @@
         ValueEnumElements(const_cast<value*>(this), &enum_cb::_callback, &cb);
       }
 
+#ifdef CPP11
       // calls cbf for each key/value pair found in T_OBJECT or T_MAP  
       void each_key_value(key_value_cb cbf) const
       {
         ValueEnumElements(const_cast<value*>(this), &enum_cb::lambda_callback, &cbf);
       }
+#endif      
       
       value key(int n) const
       {
@@ -433,7 +438,7 @@
         return rv;
       }
 
-      value call() const {  return call(0,nullptr);  }
+      value call() const {  return call(0,0);  }
       value call( const value& p1 ) const {  return call(1,&p1); }
       value call( const value& p1, const value& p2 )  const { value args[2] = { p1,p2 };  return call(2,args); }
       value call( const value& p1, const value& p2, const value& p3 ) const { value args[3] = { p1,p2,p3 };  return call(3,args); }
